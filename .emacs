@@ -284,6 +284,12 @@
          ("C-x C-d" . consult-dir)
          ("C-x C-j" . consult-dir-jump-file)))
 
+(use-package consult-lsp
+  :after (consult lsp))
+
+(use-package consult-yasnippet
+  :after (consult yasnippet))
+
 (use-package embark
   :bind
   (("C-." . embark-act)         ;; pick some comfortable binding
@@ -347,8 +353,9 @@
   (global-corfu-mode)
 
   ;; Enable optional extension modes:
-  ;; (corfu-history-mode)
-  ;; (corfu-popupinfo-mode)
+  (corfu-history-mode)
+  (corfu-popupinfo-mode)
+  (corfu-indexed-mode)
   :config
   ;; Enable auto completion, configure delay, trigger and quitting
   (setq corfu-auto t
@@ -356,6 +363,30 @@
 	corfu-auto-trigger "." ;; Custom trigger characters
 	corfu-quit-no-match 'separator) ;; or t
   )
+
+;; Add extensions
+(use-package cape
+  :custom
+  (cape-dabbrev-buffer-function 'cape-text-buffers) ;; default was cape-same-mode-buffers
+  ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
+  ;; Press C-c p ? to for help.
+  :bind ("C-c p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
+  ;; Alternatively bind Cape commands individually.
+  ;; :bind (("C-c p d" . cape-dabbrev)
+  ;;        ("C-c p h" . cape-history)
+  ;;        ("C-c p f" . cape-file)
+  ;;        ...)
+  :init
+  ;; Add to the global default value of `completion-at-point-functions' which is
+  ;; used by `completion-at-point'.  The order of the functions matters, the
+  ;; first function returning a result wins.  Note that the list of buffer-local
+  ;; completion functions takes precedence over the global list.
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  ;; (add-hook 'completion-at-point-functions #'cape-history)
+  ;; ...
+)
 
 ;; A few more useful configurations...
 (use-package emacs
@@ -470,8 +501,8 @@
   ;; See info for font-lock-keywords
   (vterm-mode . (lambda ()
 		  (font-lock-add-keywords nil
-					  '(("\\<\\(error\\)\\>" 1 compilation-error-face t)
-					    ("\\<\\(warning\\)\\>" 1 font-lock-warning-face t))))))
+					  '(("\\(?:E\\(?:RROR\\|rror\\)\\|error\\)" 0 compilation-error-face t)
+					    ("\\(?:W\\(?:ARNING\\|arning\\)\\|warning\\)" 0 font-lock-warning-face t))))))
 
 ;;; Dev env
 
@@ -518,6 +549,7 @@
   (lsp-log-io nil) ;; this causes slow down
   (lsp-enable-on-type-formatting nil) ;; this somehow interferes with indentation (e.g., treesit-indent)
   :config
+  (lsp-semantic-tokens-mode)
   (lsp-enable-which-key-integration t)
   (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\out\\'")
   :bind (("C-c e r" . lsp-find-references)
@@ -547,6 +579,12 @@
 (use-package lsp-treemacs
   :after (lsp treemacs))
 
+(use-package yasnippet
+  :config
+  (yas-global-mode))
+
+(use-package yasnippet-snippets)
+
 (use-package flycheck
   :defer t
   :custom
@@ -566,34 +604,10 @@
 		      (setq-local comint-input-ring-file-name ".gdb_history")
 		      (comint-read-input-ring))))
 
-;; LSP client for clangd
-;; (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
-;; (add-hook 'c-mode-hook 'eglot-ensure)
-;; (add-hook 'c++-mode-hook 'eglot-ensure)
-
-;; use flycheck instead of flymake with eglot
-;; (use-package flycheck-eglot
-;;   :after (flycheck eglot)
-;;   :config (global-flycheck-eglot-mode 1))
-
-;;; ETC
-;; (defun my-treesitter-c-setup ()
-;;   (when (member major-mode '(c-ts-mode c++-ts-mode))
-;;     (setq my-indent-style 'linux)
-
 (use-package c-ts-mode
   :custom
   (c-ts-mode-indent-offset 8)
   (c-ts-mode-indent-style 'linux))
-
-;; (add-hook 'c-mode-common-hook
-;; 	  (lambda ()
-;; 	    (c-set-style "linux")
-;; ;; 	    (modify-syntax-entry ?_ "w") ;; regard underscore as part of the word
-;; ;; 	    ;; (setq indent-tabs-mode nil) ;; don't include tabs in indent
-;; ;; 		;; (setq indent-line-function 'insert-tab)
-;; ;; 		;; (setq tab-width 4)
-;; 	    ))
 
 (use-package markdown-mode
   :defer t
@@ -605,13 +619,6 @@
   (markdown-fontify-code-blocks-natively t)
   (markdown-fontify-whole-heading-line t)
   (markdown-enable-highlighting-syntax t)
-  ;; :bind
-  ;; :map markdown-mode-map
-  ;; ("<tab>" . company-complete-common)
-
-;; (eval-after-load 'markdown-mode
-;;   '(define-key markdown-mode-map (kbd "<tab>") 'company-complete-common)) ;; indentation somehow broken in markdown-mode
-
   :hook
   (markdown-mode . (lambda ()
 		     (modify-syntax-entry ?_ "w") ;; regard underscore as part of the word
