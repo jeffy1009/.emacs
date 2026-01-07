@@ -102,6 +102,12 @@
 (use-package all-the-icons
   :if (display-graphic-p))
 
+(use-package all-the-icons-completion
+  :after (marginalia all-the-icons)
+  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+  :init
+  (all-the-icons-completion-mode))
+
 (use-package dashboard
   :config
   (dashboard-setup-startup-hook)
@@ -317,7 +323,9 @@
   ;; (add-hook 'context-menu-functions #'embark-context-menu 100)
 
   :config
-  (setq embark-quit-after-action nil)
+  ;; quit after action for embark-insert so that the candidate is inserted at the
+  ;; original location rather than the preview location
+  (setq embark-quit-after-action '((embark-insert . t) (t . nil)))
 
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
