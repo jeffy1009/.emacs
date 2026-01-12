@@ -31,6 +31,7 @@
   (make-backup-files nil) ; stop creating ~ files
   (revert-without-query '(".*")) ;; don't prompt on M-x revert-buffer
   (project-vc-include-untracked nil) ;; ignore untracked files for project.el commands
+  (vc-follow-symlinks t) ;; when the file is symlink to version-controlled file, visit the linked file without prompting
   (warning-minimum-level :error) ; stop *Warnings* buffer immediately showing for every warning
   (compilation-skip-threshold 2)
   (display-time-default-load-average nil)
@@ -60,6 +61,7 @@
   (xterm-mouse-mode)
   (save-place-mode) ;; save cursor positions between sessions
   (savehist-mode) ;; save minibuffer history
+  (desktop-save-mode) ;; save sessions and restore it automatically
   (ffap-bindings) ;; make find-file to try find-file-at-point first
   (windmove-default-keybindings) ;; switch windows with shift-arrows instead of "C-x o" all the time
   :mode
@@ -154,7 +156,12 @@
   (ediff-split-window-function 'split-window-horizontally))
 
 (use-package vertico
-  :init (vertico-mode))
+  :init (vertico-mode)
+  :config
+  (vertico-indexed-mode)
+  (keymap-set vertico-map "TAB" #'minibuffer-complete)
+  ;; Clean shadowed path. dirvish-peek-mode does not work properly when shadowed path exists
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
 ;; Optionally use the `orderless' completion style.
 (use-package orderless
@@ -285,6 +292,8 @@
 	  "--full-path --color=never --type file")))
 
 (use-package consult-dir
+  :custom
+  (consult-dir-shadow-filenames nil)
   :bind (("C-x C-d" . consult-dir)
          :map vertico-map
          ("C-x C-d" . consult-dir)
@@ -370,6 +379,7 @@
 	corfu-auto-delay 0.2
 	corfu-auto-trigger "." ;; Custom trigger characters
 	corfu-quit-no-match 'separator) ;; or t
+  (keymap-unset corfu-map "RET")
   )
 
 ;; Add extensions
@@ -391,7 +401,7 @@
   ;; completion functions takes precedence over the global list.
   (add-hook 'completion-at-point-functions #'cape-dabbrev)
   (add-hook 'completion-at-point-functions #'cape-file)
-  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  ;; (add-hook 'completion-at-point-functions #'cape-elisp-block)
   ;; (add-hook 'completion-at-point-functions #'cape-history)
   ;; ...
 )
@@ -444,37 +454,7 @@
   :init
   (bufferlo-mode)
   :custom
-  (tab-bar-new-tab-choice "*scratch*")
-  :config
-  (with-eval-after-load 'consult
-    (defvar my:bufferlo-consult--source-local-buffers
-      (list :name "Bufferlo Local Buffers"
-            :narrow   ?l
-            :category 'buffer
-            :face     'consult-buffer
-            :history  'buffer-name-history
-            :state    #'consult--buffer-state
-            :default  t
-            :items    (lambda () (consult--buffer-query
-				  :predicate #'bufferlo-local-buffer-p
-				  :sort 'visibility
-				  :as #'buffer-name)))
-      "Local Bufferlo buffer candidate source for `consult-buffer'.")
-    (defvar my:bufferlo-consult--source-other-buffers
-      (list :name "Bufferlo Other Buffers"
-            :narrow   ?b
-            :category 'buffer
-            :face     'consult-buffer
-            :history  'buffer-name-history
-            :state    #'consult--buffer-state
-            :items    (lambda () (consult--buffer-query
-				  :predicate #'bufferlo-non-local-buffer-p
-				  :sort 'visibility
-				  :as #'buffer-name)))
-      "Non-local Bufferlo buffer candidate source for `consult-buffer'.")
-    ;; add in the reverse order of display preference
-    (add-to-list 'consult-buffer-sources 'my:bufferlo-consult--source-other-buffers)
-    (add-to-list 'consult-buffer-sources 'my:bufferlo-consult--source-local-buffers)))
+  (tab-bar-new-tab-choice "*scratch*"))
 
 (use-package treemacs
   :defer t
@@ -556,6 +536,13 @@
   ;; (lsp-clients-clangd-args '("--log=verbose"))
   (lsp-log-io nil) ;; this causes slow down
   (lsp-enable-on-type-formatting nil) ;; this somehow interferes with indentation (e.g., treesit-indent)
+  (lsp-completion-provider :none) ;; we use Corfu!
+  :init
+  (defun my/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(orderless))
+    ;; Optionally configure the cape-capf-buster.
+    (setq-local completion-at-point-functions (list (cape-capf-buster #'lsp-completion-at-point))))
   :config
   (lsp-semantic-tokens-mode)
   (lsp-enable-which-key-integration t)
@@ -568,7 +555,8 @@
   ((c-mode-common . lsp)
    (c-ts-mode . lsp)
    (c++-ts-mode . lsp)
-   (python-mode . lsp)))
+   (python-mode . lsp)
+   (lsp-completion-mode . my/lsp-mode-setup-completion)))
 
 (use-package lsp-ui
   :custom
@@ -612,6 +600,10 @@
 		      (setq-local comint-input-ring-file-name ".gdb_history")
 		      (comint-read-input-ring))))
 
+(use-package emacs
+  :custom
+  (setq sh-basic-offset 8))
+
 (use-package c-ts-mode
   :custom
   (c-ts-mode-indent-offset 8)
@@ -630,7 +622,8 @@
   :hook
   (markdown-mode . (lambda ()
 		     (modify-syntax-entry ?_ "w") ;; regard underscore as part of the word
-		     (setq-local indent-tabs-mode nil)))) ;; don't include tabs in indent
+		     (setq-local indent-tabs-mode nil) ;; don't include tabs in indent
+		     (outline-minor-mode))))
 (use-package cmake-mode
   :defer t)
 (use-package dockerfile-mode
@@ -643,6 +636,18 @@
   (let ((hl-face '(:background "gold"))) ; Define your desired face
     ;; Create an overlay for the region
     (overlay-put (make-overlay beg end) 'face hl-face)))
+
+(defun align-numbers (BEG END)
+  "Align numbers in region BEG END."
+  (interactive "r")
+  (align-regexp BEG END "\\s-\\([0-9]+\\)\\s-" -1 0 t))
+
+(defun count-visible-lines-in-buffer ()
+  "Count all visible lines in the current buffer (excluding hidden lines)."
+  (interactive)
+  (let* ((visible-lines (count-lines (point-min) (point-max) t))
+         (total-lines (count-lines (point-min) (point-max))))
+    (message "Visible lines: %d / Total lines: %d" visible-lines total-lines)))
 
 ;; Local Variables:
 ;; flycheck-disabled-checkers: (emacs-lisp-checkdoc)
