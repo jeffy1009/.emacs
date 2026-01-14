@@ -590,7 +590,7 @@
   :defer t
   :custom
   (gud-pdb-command-name "python3 -m pdb")
-  :config
+  :init
   (defun gdb-aarch64 ()
     (interactive)
     (gud-gdb "gdb-multiarch --fullname"))
