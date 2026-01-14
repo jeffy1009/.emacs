@@ -304,7 +304,7 @@
           (minibuffer-completing-file-name t))
       (consult--read #'read-file-name-internal :state (consult--file-preview)
                      :prompt prompt
-                     :initial initial
+                     :initial default-directory
                      :require-match mustmatch
                      :predicate pred)))
   (setq read-file-name-function #'consult-find-file-with-preview))
