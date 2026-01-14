@@ -24,6 +24,7 @@
       '(("melpa-stable" . "https://stable.melpa.org/packages/")
         ("melpa"        . "https://melpa.org/packages/")
 	("gnu"          . "https://elpa.gnu.org/packages/")))
+  (tab-bar-new-tab-choice "*scratch*")
   ;; Configure buffer name uniquification
   (uniquify-separator "/")               ;; The separator in buffer names.
   (uniquify-buffer-name-style 'forward) ;; names/in/this/style
@@ -110,6 +111,14 @@
   :init
   (all-the-icons-completion-mode))
 
+(use-package kind-icon
+  :after corfu
+  ;:custom
+  ; (kind-icon-blend-background t)
+  ; (kind-icon-default-face 'corfu-default) ; only needed with blend-background
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
 (use-package dashboard
   :config
   (dashboard-setup-startup-hook)
@@ -125,10 +134,6 @@
   :config
   (add-to-list 'recentf-exclude "treemacs-persist")
   (add-to-list 'recentf-exclude "emacs.d/bookmarks"))
-
-(use-package dirvish
-  :defer 3
-  :config (dirvish-peek-mode)) ;; dirvish-peek-mode enables preview for find-file
 
 (use-package helpful
   :bind
@@ -160,7 +165,7 @@
   :config
   (vertico-indexed-mode)
   (keymap-set vertico-map "TAB" #'minibuffer-complete)
-  ;; Clean shadowed path. dirvish-peek-mode does not work properly when shadowed path exists
+  ;; Clean shadowed path.
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
 ;; Optionally use the `orderless' completion style.
@@ -180,6 +185,7 @@
 
 ;; Example configuration for Consult
 (use-package consult
+  :demand t
   ;; Replace bindings. Lazily loaded by `use-package'.
   :bind (;; C-c bindings in `mode-specific-map'
          ("C-c M-x" . consult-mode-command)
@@ -289,7 +295,19 @@
   ;; Add '--type file' to the default value to make consult-fd find files only by default
   (setq consult-fd-args
 	'((if (executable-find "fdfind" 'remote) "fdfind" "fd")
-	  "--full-path --color=never --type file")))
+	  "--full-path --color=never --type file"))
+
+  ;; Previewing files in find-file. https://github.com/minad/consult/wiki#previewing-files-in-find-file
+  (defun consult-find-file-with-preview (prompt &optional dir default mustmatch initial pred)
+    (interactive)
+    (let ((default-directory (or dir default-directory))
+          (minibuffer-completing-file-name t))
+      (consult--read #'read-file-name-internal :state (consult--file-preview)
+                     :prompt prompt
+                     :initial initial
+                     :require-match mustmatch
+                     :predicate pred)))
+  (setq read-file-name-function #'consult-find-file-with-preview))
 
 (use-package consult-dir
   :custom
@@ -436,25 +454,6 @@
   (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
   (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
   (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
-
-;; (use-package company
-;;   :diminish
-;;   :init
-;;   (setq
-;;    ;; company-idle-delay nil   ;; avoid auto completion popup, use TAB to show it
-;;         company-async-timeout 15 ;; completion may be slow
-;;         company-lsp-enable-snippet nil ;; don't complete arguments
-;;         company-tooltip-align-annotations t)
-;;   :hook (after-init . global-company-mode))
-;; (setq tab-always-indent 'complete)
-;; (global-set-key (kbd "TAB") 'company-indent-or-complete-common)
-;; (setq company-dabbrev-downcase nil) ;; preserve case when completing
-
-(use-package bufferlo
-  :init
-  (bufferlo-mode)
-  :custom
-  (tab-bar-new-tab-choice "*scratch*"))
 
 (use-package treemacs
   :defer t
