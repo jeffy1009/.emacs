@@ -65,6 +65,14 @@
   (desktop-save-mode) ;; save sessions and restore it automatically
   (ffap-bindings) ;; make find-file to try find-file-at-point first
   (windmove-default-keybindings) ;; switch windows with shift-arrows instead of "C-x o" all the time
+  ;; faster async shell command
+  (defun my-async-shell-command (command)
+    "Execute COMMAND asynchronously in BUFFER with process-connection-type set to nil."
+    (interactive
+     (list (read-shell-command "Async shell command: ")))
+    (let ((process-connection-type nil))
+      (async-shell-command command)))
+  :bind ("M-&" . my-async-shell-command)
   :mode
   ("Makefile" . makefile-mode)  ;; use makefile-mode for filenames containing "Makefile"
   :hook
