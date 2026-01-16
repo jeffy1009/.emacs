@@ -559,10 +559,10 @@
          ("C-c e i" . lsp-find-implementation)
          ("C-c e t" . lsp-find-type-definition))
   :hook
-  ((c-mode-common . lsp)
-   (c-ts-mode . lsp)
-   (c++-ts-mode . lsp)
-   (python-mode . lsp)
+  ((c-mode-common . lsp-deferred)
+   (c-ts-mode . lsp-deferred)
+   (c++-ts-mode . lsp-deferred)
+   (python-mode . lsp-deferred)
    (lsp-completion-mode . my/lsp-mode-setup-completion)))
 
 (use-package lsp-ui
