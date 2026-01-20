@@ -231,7 +231,7 @@
          ("M-s d" . consult-fd)                  ;; Alternative: consult-fd
          ("M-s c" . consult-locate)
          ("M-s g" . consult-grep)
-         ("M-s G" . consult-git-grep)
+         ("M-s G" . consult-git-grep-other-window)
          ("M-s r" . consult-ripgrep)
          ("M-s l" . consult-line)
          ("M-s L" . consult-line-multi)
@@ -342,8 +342,13 @@
                      :predicate pred
 		     :default default-filename)))
   (setq read-file-name-function #'consult-find-file-with-preview)
-  )
 
+  (defun consult-git-grep-other-window ()
+  "Variant of `consult-git-grep', switching to a buffer in another window."
+  (interactive)
+  (let ((consult--buffer-display #'switch-to-buffer-other-window))
+    (consult-git-grep)))
+  )
 
 (use-package consult-dir
   :custom
