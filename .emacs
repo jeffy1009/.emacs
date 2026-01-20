@@ -306,16 +306,44 @@
 	  "--full-path --color=never --type file"))
 
   ;; Previewing files in find-file. https://github.com/minad/consult/wiki#previewing-files-in-find-file
-  (defun consult-find-file-with-preview (prompt &optional dir default mustmatch initial pred)
+  ;; Code partially copied from read-file-name-default to mimic original find-file behavior
+  (defun consult-find-file-with-preview (prompt &optional dir default-filename mustmatch initial pred)
     (interactive)
-    (let ((default-directory (or dir default-directory))
-          (minibuffer-completing-file-name t))
+    (unless dir (setq dir (or default-directory "~/")))
+    (unless (file-name-absolute-p dir) (setq dir (expand-file-name dir)))
+    (unless default-filename
+      (setq default-filename
+            (cond
+             ((null initial) buffer-file-name)
+             ;; Special-case "" because (expand-file-name "" "/tmp/") returns
+             ;; "/tmp" rather than "/tmp/" (bug#39057).
+             ((equal "" initial) dir)
+             (t (expand-file-name initial dir)))))
+    ;; If dir starts with user's homedir, change that to ~.
+    (setq dir (abbreviate-file-name dir))
+    ;; Likewise for default-filename.
+    (if default-filename
+	(setq default-filename
+	      (if (consp default-filename)
+		  (mapcar 'abbreviate-file-name default-filename)
+		(abbreviate-file-name default-filename))))
+    (let ((insdef (cond
+                   ((and insert-default-directory (stringp dir))
+                    (if initial
+			(cons (minibuffer-maybe-quote-filename (concat dir initial))
+                              (length (minibuffer-maybe-quote-filename dir)))
+                      (minibuffer-maybe-quote-filename dir)))
+                   (initial (cons (minibuffer-maybe-quote-filename initial) 0))))
+	  (minibuffer-completing-file-name t))
       (consult--read #'read-file-name-internal :state (consult--file-preview)
                      :prompt prompt
-                     :initial default-directory
+                     :initial insdef
                      :require-match mustmatch
-                     :predicate pred)))
-  (setq read-file-name-function #'consult-find-file-with-preview))
+                     :predicate pred
+		     :default default-filename)))
+  (setq read-file-name-function #'consult-find-file-with-preview)
+  )
+
 
 (use-package consult-dir
   :custom
