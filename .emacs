@@ -168,6 +168,10 @@
   (ediff-diff-options "-w")
   (ediff-split-window-function 'split-window-horizontally))
 
+(use-package ace-link
+  :config
+  (ace-link-setup-default))
+
 (use-package vertico
   :init (vertico-mode)
   :config
