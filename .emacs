@@ -347,11 +347,11 @@
 		     :default default-filename)))
   (setq read-file-name-function #'consult-find-file-with-preview)
 
-  (defun consult-git-grep-other-window ()
+  (defun consult-git-grep-other-window (&optional dir initial)
   "Variant of `consult-git-grep', switching to a buffer in another window."
-  (interactive)
+  (interactive "P")
   (let ((consult--buffer-display #'switch-to-buffer-other-window))
-    (consult-git-grep)))
+    (consult-git-grep dir initial)))
   )
 
 (use-package consult-dir
