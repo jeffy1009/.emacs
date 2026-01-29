@@ -661,6 +661,8 @@
   :after (lsp treemacs))
 
 (use-package yasnippet
+  :custom
+  (yas-snippet-revival nil) ;; This causes infinite undo problem
   :config
   (yas-global-mode))
 
