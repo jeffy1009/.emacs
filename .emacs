@@ -168,6 +168,10 @@
   (ediff-diff-options "-w")
   (ediff-split-window-function 'split-window-horizontally))
 
+(use-package ace-window
+  :config
+  (global-set-key (kbd "M-o") 'ace-window))
+
 (use-package ace-link
   :config
   (ace-link-setup-default))
