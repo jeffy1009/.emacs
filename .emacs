@@ -75,6 +75,7 @@
   :bind ("M-&" . my-async-shell-command)
   :mode
   ("Makefile" . makefile-mode)  ;; use makefile-mode for filenames containing "Makefile"
+  (".gdb_breakpoints" . gdb-script-mode)
   :hook
   (prog-mode . (lambda()
 		 (setq-local show-trailing-whitespace t))))
