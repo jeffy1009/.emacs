@@ -537,6 +537,8 @@
   ;; Added M-s to this list to enable M-s prefixed commands like consult-grep
   (vterm-keymap-exceptions
    '("C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "M-s"))
+  :bind
+  ("C-/" . undo) ;; undo-fu does not work in vterm
   :hook
   ;; See info for font-lock-keywords
   (vterm-mode . (lambda ()
