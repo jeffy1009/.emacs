@@ -689,9 +689,12 @@
 		      (setq-local comint-input-ring-file-name ".gdb_history")
 		      (comint-read-input-ring))))
 
-(use-package emacs
+(use-package sh-script
   :custom
-  (setq sh-basic-offset 8))
+  (setq sh-basic-offset 8)
+  ;; configure sh-mode binding in bash-ts-mode
+  :bind (:map sh-base-mode-map
+              ("C-c C-x" . executable-interpret)))
 
 (use-package c-ts-mode
   :custom
