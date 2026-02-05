@@ -142,7 +142,7 @@
 
 (use-package recentf ;; built-in package
   :custom
-  (recentf-max-saved-items 128)
+  (recentf-max-saved-items 256)
   :config
   (add-to-list 'recentf-exclude "treemacs-persist")
   (add-to-list 'recentf-exclude "emacs.d/bookmarks"))
