@@ -64,6 +64,7 @@
   ;; Do not allow the cursor in the minibuffer prompt
   (minibuffer-prompt-properties
    '(read-only t cursor-intangible t face minibuffer-prompt))
+  (resize-mini-windows t)
   :config
   (menu-bar-mode -1)
   (tool-bar-mode -1)
