@@ -720,7 +720,7 @@
   ;; (markdown-command "/home/shin/tools/Markdown_1.0.1/Markdown.pl")
   ;; (markdown-command "grip")
   ;; (markdown-command-needs-filename t)
-  (markdown-header-scaling t)
+  ;; (markdown-header-scaling t) ;; it is already scaled
   (markdown-fontify-code-blocks-natively t)
   (markdown-fontify-whole-heading-line t)
   (markdown-enable-highlighting-syntax t)
