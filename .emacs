@@ -19,6 +19,18 @@
                       :font "Inconsolata"
 		      :height 95
                       :weight 'normal)
+  ;; emacs frame size is set based on number of characters. Adjust size pixelwise instead.
+  (setq frame-resize-pixelwise t)
+  ;; height set to 0.999 to let Windows hidden task bar to always work properly
+  (defun my-maximize-frame (dual-left)
+    (interactive "P")
+    (if (> (display-pixel-width) 3000) ;; check dual monitor
+	(if dual-left
+	    (modify-frame-parameters nil '((left . 0) (top . 0) (width . 0.5) (height . 0.999) (undecorated . t)))
+	  (modify-frame-parameters nil '((left . 1920) (top . 0) (width . 0.5) (height . 0.999) (undecorated . t))))
+      (modify-frame-parameters nil '((left . 0) (top . 0) (width . 1.0) (height . 0.999) (undecorated . t)))))
+  (global-set-key (kbd "M-<f10>") 'my-maximize-frame)
+
   :custom
   (package-archives
       '(("melpa-stable" . "https://stable.melpa.org/packages/")
