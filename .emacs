@@ -698,7 +698,7 @@
     (interactive)
     (gud-gdb "gdb-multiarch --fullname"))
   :hook (gud-mode . (lambda ()
-		      ;; (setq-local company-idle-delay nil) ;; auto completion popup is annoying in GDB..
+		      (setq-local corfu-auto nil) ;; auto completion is broken in gud
 		      (setq-local comint-input-ring-file-name ".gdb_history")
 		      (comint-read-input-ring))))
 
