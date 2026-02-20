@@ -712,7 +712,9 @@
 (use-package c-ts-mode
   :custom
   (c-ts-mode-indent-offset 8)
-  (c-ts-mode-indent-style 'linux))
+  (c-ts-mode-indent-style 'linux)
+  :bind (:map c-ts-mode-map
+              ("C-c C-u" . c-up-conditional)))
 
 (use-package markdown-mode
   :defer t
