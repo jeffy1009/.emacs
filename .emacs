@@ -550,8 +550,34 @@
   ;; Added M-s to this list to enable M-s prefixed commands like consult-grep
   (vterm-keymap-exceptions
    '("C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y" "M-s"))
+  :config
+  (defun my-vterm-send-C-k ()
+     "Send `C-k' to libvterm."
+     (interactive)
+     (kill-ring-save (point) (vterm-end-of-line))
+     (vterm-send-key "k" nil nil t))
+  (defun my-vterm-send-C-w ()
+    "Copy the previous word to the kill‑ring and send `C‑w' to libvterm."
+    (interactive)
+    ;; Save the current point, move back to the start of the previous word,
+    ;; and copy that word to the kill‑ring.
+    (save-excursion
+      ;; Remember current point
+      (let ((end (point)))
+	;; Move back over any whitespace that may follow the word.
+	(skip-chars-backward " \t\n")
+	;; Move back over the word itself (non‑whitespace characters).
+	(skip-chars-backward "^ \t\n")
+	;; Copy the region [point, end] to the kill‑ring.
+	(kill-ring-save (point) end)))
+    ;; Finally, send the actual C‑w keystroke to the terminal.
+    (vterm-send-key "w" nil nil t))
   :bind
-  ("C-/" . undo) ;; undo-fu does not work in vterm
+  (:map vterm-mode-map
+	("C-/" . undo) ;; undo-fu does not work in vterm
+	("C-k" . my-vterm-send-C-k)
+	("C-w" . my-vterm-send-C-w)
+	("M-y" . vterm-yank-pop))
   :hook
   ;; See info for font-lock-keywords
   (vterm-mode . (lambda ()
