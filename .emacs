@@ -65,6 +65,9 @@
   (minibuffer-prompt-properties
    '(read-only t cursor-intangible t face minibuffer-prompt))
   (resize-mini-windows t)
+  (visible-bell t) ;; turn off annoying beep sound and flash frame instead
+  (initial-buffer-choice "~/notes/todo.md")
+  (default-input-method "korean-hangul")
   :config
   (menu-bar-mode -1)
   (tool-bar-mode -1)
