@@ -824,11 +824,15 @@ Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
 (use-package cc-mode)
 
 (use-package c-ts-mode
-  :custom
-  (c-ts-mode-indent-offset 8)
-  (c-ts-mode-indent-style 'linux)
+  ;; :custom
+  ;; The following should be set in .dir-locals.el to apply per project
+  ;; (c-ts-mode-indent-offset 8)
+  ;; (c-ts-mode-indent-style 'linux)
   :bind (:map c-ts-mode-map
-              ("C-c C-u" . c-up-conditional)))
+              ("C-c C-u" . c-up-conditional)
+	 :map c++-ts-mode-map
+              ("C-c C-u" . c-up-conditional))
+  :hook (c-ts-mode . superword-mode))
 
 (use-package llvm-ts-mode
   :config
