@@ -757,15 +757,16 @@ Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
   :custom
   (lsp-ui-peek-always-show t)
   (lsp-ui-peek-peek-height 30)
-  (lsp-ui-peek-list-width 65)
+  ;; (lsp-ui-peek-list-width 65)
   (lsp-ui-doc-include-signature t)
   (lsp-ui-sideline-show-code-actions t)
   (lsp-ui-sideline-show-symbol nil)
   (lsp-imenu-sort-methods '(position))
   :bind (("C-c d" . lsp-ui-doc-show)
          ("C-c i" . lsp-ui-imenu)
-	 ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-         ([remap xref-find-references] . lsp-ui-peek-find-references)))
+	 ;; ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+         ;; ([remap xref-find-references] . lsp-ui-peek-find-references)
+	 ))
 
 (use-package lsp-treemacs
   :after (lsp treemacs))
