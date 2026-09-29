@@ -217,6 +217,30 @@
   ([remap kill-ring-save] . easy-kill)
   ([remap mark-sexp] . easy-mark))
 
+;; This lets me click a link in emacs which will be opened in Windows machine.
+;; Need to setup reverse port forwarding, and a powershell listener on Windows.
+(defconst my-windows-browser-token
+  (string-trim
+   (with-temp-buffer
+     (insert-file-contents "~/.emacs-browser-token")
+     (buffer-string))))
+
+(defun my-browse-url-windows (url &optional _new-window)
+  (let ((request-url
+         (format "http://127.0.0.1:8765/open?token=%s&url=%s"
+                 (url-hexify-string my-windows-browser-token)
+                 (url-hexify-string url))))
+    (url-retrieve
+     request-url
+     (lambda (_status)
+       (goto-char (point-min))
+       (when (re-search-forward "^$" nil t)
+         (delete-region (point-min) (point))))
+     nil
+     t)))
+
+(setq browse-url-browser-function #'my-browse-url-windows)
+
 (use-package vertico
   :init (vertico-mode)
   :config
