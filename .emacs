@@ -81,7 +81,7 @@
   (xterm-mouse-mode)
   (save-place-mode) ;; save cursor positions between sessions
   (savehist-mode) ;; save minibuffer history
-  (desktop-save-mode) ;; save sessions and restore it automatically
+  ;; (desktop-save-mode) ;; save sessions and restore it automatically
   (recentf-mode)
   (ffap-bindings) ;; make find-file to try find-file-at-point first
   (windmove-default-keybindings) ;; switch windows with shift-arrows instead of "C-x o" all the time
