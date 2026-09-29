@@ -806,6 +806,13 @@ Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
 		      (setq-local comint-input-ring-file-name ".gdb_history")
 		      (comint-read-input-ring))))
 
+(use-package gdb-mi
+  :defer t
+  :init
+  (defun gdb-qemu ()
+    (interactive)
+    (gdb "gdb -i=mi --fullname /home/shin/proj/mte/qemu/QEMU/build/qemu-system-aarch64")))
+
 (use-package sh-script
   :custom
   (setq sh-basic-offset 8)
