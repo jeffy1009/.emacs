@@ -633,6 +633,34 @@
 					  '(("\\(?:E\\(?:RROR\\|rror\\)\\|error\\)" 0 compilation-error-face t)
 					    ("\\(?:W\\(?:ARNING\\|arning\\)\\|warning\\)" 0 font-lock-warning-face t))))))
 
+;; let's try this for claude-code-ide since it mentions this provides the smoothest experience
+(use-package ghostel
+  :ensure t
+  :bind (:map ghostel-semi-char-mode-map
+	      ("C-k"  . my/ghostel-send-C-k-and-kill)
+	      )
+  :config
+  (defun my/ghostel-send-C-k-and-kill ()
+    "Send `C-k' to ghostel.
+Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
+    (interactive)
+    (kill-ring-save (point) (line-end-position))
+    (ghostel-send-key "k" "ctrl"))
+  :hook
+  ;; To fix underscore display issue in ccstatusline in claude-code
+  ;; https://github.com/sirmalloc/ccstatusline/issues/241
+  (ghostel-mode . (lambda()
+		 (setq-local nobreak-char-display nil)))
+  )
+
+(use-package claude-code-ide
+  :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
+  :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
+  :config
+  (claude-code-ide-emacs-tools-setup) ; Optionally enable Emacs MCP tools
+  (setq claude-code-ide-terminal-backend 'ghostel)
+  )
+
 ;;; Dev env
 
 ;; An amazing git plugin
