@@ -148,15 +148,6 @@
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
-(use-package dashboard
-  :config
-  (dashboard-setup-startup-hook)
-  (setq dashboard-items '((recents . 100)
-			  (projects . 5)))
-  (setq dashboard-icon-type 'all-the-icons)
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t))
-
 (use-package recentf ;; built-in package
   :custom
   (recentf-max-saved-items 256)
