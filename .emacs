@@ -243,6 +243,8 @@
 
 (use-package vertico
   :init (vertico-mode)
+  :custom
+  (vertico-count 20)
   :config
   (vertico-indexed-mode)
   (keymap-set vertico-map "TAB" #'minibuffer-complete)
