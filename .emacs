@@ -811,6 +811,9 @@ Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
   :bind (:map sh-base-mode-map
               ("C-c C-x" . executable-interpret)))
 
+;; make cc-mode functions such as c-up-conditional available
+(use-package cc-mode)
+
 (use-package c-ts-mode
   :custom
   (c-ts-mode-indent-offset 8)
