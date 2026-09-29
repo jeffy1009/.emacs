@@ -821,6 +821,14 @@ Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
   :bind (:map c-ts-mode-map
               ("C-c C-u" . c-up-conditional)))
 
+(use-package llvm-ts-mode
+  :config
+  (add-to-list
+   'treesit-language-source-alist
+   '(llvm "https://github.com/benwilliamgraham/tree-sitter-llvm"))
+  (treesit-install-language-grammar 'llvm)
+  :mode "\\.ll\\'")
+
 (use-package markdown-mode
   :defer t
   :custom
