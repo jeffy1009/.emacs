@@ -757,7 +757,7 @@ Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
   ((c-mode-common . lsp-deferred)
    (c-ts-mode . lsp-deferred)
    (c++-ts-mode . lsp-deferred)
-   (python-mode . lsp-deferred)
+   (python-ts-mode . lsp-deferred)
    (lsp-completion-mode . my/lsp-mode-setup-completion)))
 
 (use-package lsp-ui
