@@ -201,6 +201,22 @@
   :config
   (global-set-key (kbd "C-:") 'avy-goto-char-timer))
 
+(use-package easy-kill
+  :config
+  (defun easy-kill-on-project-file (_n)
+  "Get buffer file path relative to `project.el` root."
+    (if (easy-kill-get mark)
+      (easy-kill-echo "Not supported in `easy-mark'")
+      (when-let* ((proj (project-current))
+		  (root (project-root proj))
+		  (file (buffer-file-name))
+		  (name (file-relative-name file root)))
+	(easy-kill-adjust-candidate 'project-file name))))
+  (add-to-list 'easy-kill-alist '(?p project-file))
+  :bind
+  ([remap kill-ring-save] . easy-kill)
+  ([remap mark-sexp] . easy-mark))
+
 (use-package vertico
   :init (vertico-mode)
   :config
