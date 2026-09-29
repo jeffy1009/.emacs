@@ -833,7 +833,7 @@ Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
   (markdown-enable-highlighting-syntax t)
   :hook
   (markdown-mode . (lambda ()
-		     (modify-syntax-entry ?_ "w") ;; regard underscore as part of the word
+		     (superword-mode)
 		     (setq-local indent-tabs-mode nil) ;; don't include tabs in indent
 		     (outline-minor-mode))))
 (use-package cmake-mode
