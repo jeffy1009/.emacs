@@ -197,6 +197,10 @@
   :config
   (ace-link-setup-default))
 
+(use-package avy
+  :config
+  (global-set-key (kbd "C-:") 'avy-goto-char-timer))
+
 (use-package vertico
   :init (vertico-mode)
   :config
